@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Assignment Project</title>
+</head>
+<body>
+  <h2>📷 Click Photo</h2>
+  <video id="video" width="300" height="200" autoplay></video><br>
+  <button onclick="takePhoto()">Take Photo</button><br><br>
+  <canvas id="canvas" width="300" height="200" style="display:none;"></canvas>
+  <img id="photo" width="300"><br><br>
+
+  <h2>📧 Send to Gmail</h2>
+  <button onclick="sendToGmail()">Send Image to Gmail</button><br><br>
+
+  <h2>💬 Send via WhatsApp</h2>
+  <a id="whatsapp" href="#" target="_blank">Send Message on WhatsApp</a><br><br>
+
+  <h2>📍 Open Current Location</h2>
+  <button onclick="openCurrentLocation()">Open Location on Map</button><br><br>
+
+  <h2>🗺️ Show Route</h2>
+  <input type="text" id="destination" placeholder="Enter destination"><br>
+  <button onclick="showRoute()">Show Route in Map</button>
+
+  <script>
+    // Camera setup
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        document.getElementById('video').srcObject = stream;
+      });
+
+    function takePhoto() {
+      let canvas = document.getElementById('canvas');
+      let video = document.getElementById('video');
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      let photoURL = canvas.toDataURL();
+      document.getElementById('photo').src = photoURL;
+      // Store for email/whatsapp if needed
+      localStorage.setItem("photoURL", photoURL);
+    }
+
+    function sendToGmail() {
+      let subject = "Photo from my app";
+      let body = "Photo attached manually.\nImage link: [You need to paste image here manually]";
+      window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+    }
+
+    function openCurrentLocation() {
+      navigator.geolocation.getCurrentPosition(pos => {
+        let lat = pos.coords.latitude;
+        let lon = pos.coords.longitude;
+        window.open(`https://www.google.com/maps?q=${lat},${lon}`);
+      });
+    }
+
+    function showRoute() {
+      navigator.geolocation.getCurrentPosition(pos => {
+        let startLat = pos.coords.latitude;
+        let startLon = pos.coords.longitude;
+        let dest = document.getElementById('destination').value;
+        if (dest) {
+          window.open(`https://www.google.com/maps/dir/${startLat},${startLon}/${encodeURIComponent(dest)}`);
+        } else {
+          alert("Please enter a destination.");
+        }
+      });
+    }
+
+    // WhatsApp message link
+    document.getElementById('whatsapp').href = "https://wa.me/?text=" + encodeURIComponent("Hello! I captured a photo. You can view it by opening the app and checking my message.");
+  </script>
+</body>
+</html>
